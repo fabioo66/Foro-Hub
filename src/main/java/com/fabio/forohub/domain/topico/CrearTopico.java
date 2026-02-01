@@ -11,7 +11,7 @@ public class CrearTopico {
     private TopicoRepository repository;
 
     public Topico crearTopico(DatosRegistroTopico datos) {
-        var existeDuplicado = repository.existsByTituloAndMensaje(datos.titulo(), datos.mensaje());
+        var existeDuplicado = repository.existsByTituloAndMensajeAndActivoTrue(datos.titulo(), datos.mensaje());
 
         if (existeDuplicado) {
             throw new ValidacionException("Ya existe un tópico con el mismo título y mensaje.");
