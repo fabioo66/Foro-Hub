@@ -1,5 +1,6 @@
 package com.fabio.forohub.domain.usuario;
 
+import com.fabio.forohub.domain.topico.Topico;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +21,13 @@ public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String nombre;
+    private String email;
     private String password;
+
+    @OneToMany(mappedBy = "autor", fetch = FetchType.LAZY)
+    private List<Topico> topicos;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -40,7 +46,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

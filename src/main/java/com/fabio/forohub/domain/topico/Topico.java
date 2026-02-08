@@ -1,5 +1,8 @@
 package com.fabio.forohub.domain.topico;
 
+import com.fabio.forohub.domain.topico.dto.DatosActualizacionTopico;
+import com.fabio.forohub.domain.topico.dto.DatosRegistroTopico;
+import com.fabio.forohub.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,16 +26,19 @@ public class Topico {
     private LocalDateTime fechaCreacion;
     @Enumerated(EnumType.STRING)
     private Estado estado;
-    private String autor;
+
+    @ManyToOne
+    private Usuario autor;
+
     private String curso;
 
-    public Topico(DatosRegistroTopico datos) {
+    public Topico(DatosRegistroTopico datos, Usuario autor) {
         this.activo = true;
         this.titulo = datos.titulo();
         this.mensaje = datos.mensaje();
         this.fechaCreacion = LocalDateTime.now();
         this.estado = Estado.ABIERTO;
-        this.autor = datos.autor();
+        this.autor = autor;
         this.curso = datos.curso();
     }
 
