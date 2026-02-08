@@ -1,7 +1,11 @@
 package com.fabio.forohub.controller;
 
-import com.fabio.forohub.ValidacionException;
-import com.fabio.forohub.domain.topico.*;
+import com.fabio.forohub.domain.topico.dto.DatosActualizacionTopico;
+import com.fabio.forohub.domain.topico.dto.DatosDetalleTopico;
+import com.fabio.forohub.domain.topico.dto.DatosListaTopico;
+import com.fabio.forohub.domain.topico.dto.DatosRegistroTopico;
+import com.fabio.forohub.domain.usuario.Usuario;
+import com.fabio.forohub.service.TopicoService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,64 +24,39 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TopicoController {
 
     @Autowired
-    private TopicoRepository repository;
+    private TopicoService topicoService;
 
-    @Autowired
-    private CrearTopico topico;
-
-    @Transactional
     @PostMapping
-    public ResponseEntity registrarTopico(@RequestBody @Valid DatosRegistroTopico datos, UriComponentsBuilder uriComponentsBuilder) {
-        var detalleTopico = topico.crearTopico(datos);
-        repository.save(detalleTopico);
+    public ResponseEntity<DatosDetalleTopico> registrarTopico(@RequestBody @Valid DatosRegistroTopico datos, UriComponentsBuilder uriComponentsBuilder, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+        var topico = topicoService.crearTopico(datos, usuarioAutenticado);
 
-        var uri = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(detalleTopico.getId()).toUri();
+        var uri = uriComponentsBuilder.path("/topicos/{id}")
+                .buildAndExpand(topico.getId()).toUri();
 
-        return ResponseEntity.created(uri).body(new DatosDetalleTopico(detalleTopico));
+        return ResponseEntity.created(uri).body(new DatosDetalleTopico(topico));
     }
 
     @GetMapping
-    public ResponseEntity<Page<DatosListaTopico>> listarTopicos(@PageableDefault(size = 10, sort={"fechaCreacion"}, direction = Sort.Direction.ASC) Pageable paginacion) {
-        var page = repository.findAllByActivoTrue(paginacion).
-                map(DatosListaTopico::new);
-
+    public ResponseEntity<Page<DatosListaTopico>> listarTopicos(@PageableDefault(size = 10, sort = {"fechaCreacion"}, direction = Sort.Direction.ASC) Pageable paginacion) {
+        var page = topicoService.listarTopicos(paginacion);
         return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity detallarTopico(@PathVariable Long id) {
-        var topico = repository.getReferenceById(id);
-        return ResponseEntity.ok(new DatosListaTopico(topico));
+    public ResponseEntity<DatosDetalleTopico> detallarTopico(@PathVariable Long id) {
+        var detalle = topicoService.obtenerDetalle(id);
+        return ResponseEntity.ok(detalle);
     }
 
-    @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity actualizarTopico(@PathVariable Long id,
-                                           @RequestBody @Valid DatosActualizacionTopico datos) {
-        var topicoOptional = repository.findById(id);
-
-        if (topicoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var topico = topicoOptional.get();
-
-        // Validar que no exista OTRO tópico con el mismo título y mensaje
-        var existeOtroTopico = repository.existsByTituloAndMensajeAndIdNotAndActivoTrue(datos.titulo(), datos.mensaje(), id);
-
-        if (existeOtroTopico) {
-            throw new ValidacionException("Ya existe un tópico con el mismo título y mensaje.");
-        }
-
-        topico.actualizarInformaciones(datos);
-        return ResponseEntity.ok(new DatosDetalleTopico(topico));
+    public ResponseEntity<DatosDetalleTopico> actualizarTopico(@PathVariable Long id, @RequestBody @Valid DatosActualizacionTopico datos, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+        var detalle = topicoService.actualizarTopico(id, datos, usuarioAutenticado);
+        return ResponseEntity.ok(detalle);
     }
 
-    @Transactional
     @DeleteMapping("/{id}")
-    public ResponseEntity eliminarTopico(@PathVariable Long id) {
-        var topico = repository.getReferenceById(id);
-        topico.deshabilitar();
+    public ResponseEntity<Void> eliminarTopico(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+        topicoService.eliminarTopico(id, usuarioAutenticado);
         return ResponseEntity.noContent().build();
     }
 }
