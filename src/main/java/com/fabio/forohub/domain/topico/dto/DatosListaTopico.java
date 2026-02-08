@@ -1,4 +1,8 @@
-package com.fabio.forohub.domain.topico;
+package com.fabio.forohub.domain.topico.dto;
+
+import com.fabio.forohub.domain.topico.Estado;
+import com.fabio.forohub.domain.topico.Topico;
+import com.fabio.forohub.domain.usuario.dto.DatosRespuestaUsuario;
 
 import java.time.LocalDateTime;
 
@@ -7,7 +11,7 @@ public record DatosListaTopico(
         String mensaje,
         LocalDateTime fechaCreacion,
         Estado estado,
-        String autor,
+        DatosRespuestaUsuario autor,
         String curso
 ) {
 
@@ -17,7 +21,7 @@ public record DatosListaTopico(
                 topico.getMensaje(),
                 topico.getFechaCreacion(),
                 topico.getEstado(),
-                topico.getAutor(),
+                new DatosRespuestaUsuario(topico.getAutor()),
                 topico.getCurso()
         );
     }
