@@ -96,6 +96,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+
+        String message = ex.getMessage();
+
+        // Detectar si es un error de enum
+        if (message != null && message.contains("No enum constant")) {
+            // Extraer el valor inválido y el nombre del enum
+            String[] parts = message.split("\\.");
+            String enumValue = parts.length > 0 ? parts[parts.length - 1] : "valor desconocido";
+            String enumClass = parts.length > 1 ? parts[parts.length - 2] : "enum";
+
+            message = String.format("Valor inválido '%s' para el campo %s. Verifique los valores permitidos.",
+                    enumValue, enumClass);
+        }
+
+        var errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid Argument",
+                message,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex,
