@@ -40,13 +40,8 @@ public class AutenticacionService {
     public Usuario registrarUsuario(DatosRegistroUsuario datos) {
         validarEmailUnico(datos.email());
 
-        var usuario = new Usuario(
-                null,
-                datos.nombre(),
-                datos.email(),
-                passwordEncoder.encode(datos.password()),
-                null
-        );
+        var passwordEncriptado = passwordEncoder.encode(datos.password());
+        var usuario = new Usuario(datos, passwordEncriptado);
 
         return repository.save(usuario);
     }

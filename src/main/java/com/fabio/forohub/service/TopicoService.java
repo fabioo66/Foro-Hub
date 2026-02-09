@@ -48,6 +48,7 @@ public class TopicoService {
     @Transactional
     public void eliminarTopico(Long id, Usuario usuario) {
         var topico = validarPropietario(id, usuario);
+
         topico.deshabilitar();
     }
 
