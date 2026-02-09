@@ -15,12 +15,14 @@ public class UsuarioDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var usuario = repository.findByEmail(email);
+        // Spring Security automáticamente verifica isEnabled() del UserDetails retornado
+        // Si isEnabled() retorna false, lanza DisabledException
+        var userDetails = repository.findByEmail(email);
 
-        if (usuario == null) {
+        if (userDetails == null) {
             throw new UsernameNotFoundException("Usuario no encontrado con email: " + email);
         }
 
-        return usuario;
+        return userDetails;
     }
 }
