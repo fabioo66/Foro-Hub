@@ -1,5 +1,6 @@
 package com.fabio.forohub.domain.topico.dto;
 
+import com.fabio.forohub.domain.curso.dto.DatosDetalleCurso;
 import com.fabio.forohub.domain.topico.Estado;
 import com.fabio.forohub.domain.topico.Topico;
 import com.fabio.forohub.domain.usuario.dto.DatosRespuestaUsuario;
@@ -12,7 +13,7 @@ public record DatosListaTopico(
         LocalDateTime fechaCreacion,
         Estado estado,
         DatosRespuestaUsuario autor,
-        String curso
+        DatosDetalleCurso curso
 ) {
 
     public DatosListaTopico(Topico topico) {
@@ -22,7 +23,7 @@ public record DatosListaTopico(
                 topico.getFechaCreacion(),
                 topico.getEstado(),
                 new DatosRespuestaUsuario(topico.getAutor()),
-                topico.getCurso()
+                new DatosDetalleCurso(topico.getCurso())
         );
     }
 }
