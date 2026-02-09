@@ -1,6 +1,6 @@
-create table topicos (
+CREATE TABLE topicos (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    activo tinyint NOT NULL,
+    activo TINYINT NOT NULL,
     titulo VARCHAR(255) NOT NULL,
     mensaje TEXT NOT NULL,
     fecha_creacion DATETIME NOT NULL,
