@@ -1,14 +1,19 @@
 package com.fabio.forohub.domain.usuario;
 
+import com.fabio.forohub.domain.respuesta.Respuesta;
 import com.fabio.forohub.domain.topico.Topico;
+import com.fabio.forohub.domain.usuario.dto.DatosActualizacionEmail;
+import com.fabio.forohub.domain.usuario.dto.DatosRegistroUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,13 +26,24 @@ public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean activo;
     private String nombre;
+    @Setter
     private String email;
     private String password;
-
     @OneToMany(mappedBy = "autor", fetch = FetchType.LAZY)
     private List<Topico> topicos;
+    @OneToMany(mappedBy = "autor", fetch = FetchType.LAZY)
+    private List<Respuesta> respuestas;
 
+    public Usuario(DatosRegistroUsuario datos, String passwordEncriptado) {
+        this.activo = true;
+        this.nombre = datos.nombre();
+        this.email = datos.email();
+        this.password = passwordEncriptado;
+        this.topicos = new ArrayList<>();
+        this.respuestas = new ArrayList<>();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -61,6 +77,10 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.activo;
+    }
+
+    public void deshabilitar() {
+        this.activo = false;
     }
 }
