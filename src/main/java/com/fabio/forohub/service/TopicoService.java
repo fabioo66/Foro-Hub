@@ -1,5 +1,7 @@
 package com.fabio.forohub.service;
 
+import com.fabio.forohub.domain.curso.Curso;
+import com.fabio.forohub.domain.curso.CursoRepository;
 import com.fabio.forohub.infra.exception.ValidacionException;
 import com.fabio.forohub.domain.topico.*;
 import com.fabio.forohub.domain.topico.dto.DatosActualizacionTopico;
@@ -17,22 +19,25 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TopicoService {
 
-    private final TopicoRepository repository;
+    private final TopicoRepository topicoRepository;
+    private final CursoRepository cursoRepository;
 
     @Transactional
     public Topico crearTopico(DatosRegistroTopico datos, Usuario autor) {
+        var curso = obtenerCursoActivo(datos.idCurso());
+
         validarTopicoUnico(datos.titulo(), datos.mensaje(), null);
-        var topico = new Topico(datos, autor);
-        return repository.save(topico);
+        var topico = new Topico(datos, autor, curso);
+        return topicoRepository.save(topico);
     }
 
     public Page<DatosListaTopico> listarTopicos(Pageable paginacion) {
-        return repository.findAllByActivoTrue(paginacion)
+        return topicoRepository.findAllByActivoTrue(paginacion)
                 .map(DatosListaTopico::new);
     }
 
     public DatosDetalleTopico obtenerDetalle(Long id) {
-        var topico = repository.findById(id)
+        var topico = topicoRepository.findById(id)
                 .orElseThrow(() -> new ValidacionException("Tópico no encontrado"));
         return new DatosDetalleTopico(topico);
     }
@@ -53,7 +58,7 @@ public class TopicoService {
     }
 
     private Topico validarPropietario(Long topicoId, Usuario usuario) {
-        var topico = repository.findById(topicoId)
+        var topico = topicoRepository.findById(topicoId)
                 .orElseThrow(() -> new ValidacionException("Tópico no encontrado"));
 
         if (!topico.getAutor().getId().equals(usuario.getId())) {
@@ -68,14 +73,28 @@ public class TopicoService {
 
         if (idExcluir == null) {
             // Para creación (sin ID a excluir)
-            existeDuplicado = repository.existsByTituloAndMensajeAndActivoTrue(titulo, mensaje);
+            existeDuplicado = topicoRepository.existsByTituloAndMensajeAndActivoTrue(titulo, mensaje);
         } else {
             // Para actualización (excluyendo el mismo tópico)
-            existeDuplicado = repository.existsByTituloAndMensajeAndIdNotAndActivoTrue(titulo, mensaje, idExcluir);
+            existeDuplicado = topicoRepository.existsByTituloAndMensajeAndIdNotAndActivoTrue(titulo, mensaje, idExcluir);
         }
 
         if (existeDuplicado) {
             throw new ValidacionException("Ya existe un tópico con el mismo título y mensaje.");
         }
+    }
+
+    private Curso obtenerCurso(Long idCurso) {
+        return cursoRepository.findById(idCurso)
+                .orElseThrow(() -> new ValidacionException("Curso no encontrado"));
+    }
+
+    private Curso obtenerCursoActivo(Long idCurso) {
+        var curso = obtenerCurso(idCurso);
+
+        if (!curso.isActivo()) {
+            throw new ValidacionException("No se puede crear un tópico para un curso inactivo");
+        }
+        return curso;
     }
 }
