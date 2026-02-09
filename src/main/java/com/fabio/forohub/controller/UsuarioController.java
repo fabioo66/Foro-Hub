@@ -5,17 +5,17 @@ import com.fabio.forohub.domain.usuario.dto.DatosActualizacionEmail;
 import com.fabio.forohub.domain.usuario.dto.DatosRespuestaUsuario;
 import com.fabio.forohub.service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/usuarios")
 @RestController
+@RequiredArgsConstructor
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
     @PutMapping
     public ResponseEntity<DatosRespuestaUsuario> actualizarEmail(

@@ -8,7 +8,7 @@ import com.fabio.forohub.domain.usuario.Usuario;
 import com.fabio.forohub.service.TopicoService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,10 +21,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/topicos")
 @RestController
 @SecurityRequirement(name = "bearer-key")
+@RequiredArgsConstructor
 public class TopicoController {
 
-    @Autowired
-    private TopicoService topicoService;
+    private final TopicoService topicoService;
 
 
     @PostMapping

@@ -6,7 +6,7 @@ import com.fabio.forohub.domain.usuario.dto.DatosRegistroUsuario;
 import com.fabio.forohub.domain.usuario.Usuario;
 import com.fabio.forohub.domain.usuario.UsuarioRepository;
 import com.fabio.forohub.infra.security.TokenService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,19 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AutenticacionService {
 
-    @Autowired
-    private UsuarioRepository repository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TokenService tokenService;
+    private final UsuarioRepository repository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     public String autenticar(DatosLoginUsuario datos) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(datos.email(), datos.password());

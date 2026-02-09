@@ -7,17 +7,17 @@ import com.fabio.forohub.domain.topico.dto.DatosDetalleTopico;
 import com.fabio.forohub.domain.topico.dto.DatosListaTopico;
 import com.fabio.forohub.domain.topico.dto.DatosRegistroTopico;
 import com.fabio.forohub.domain.usuario.Usuario;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class TopicoService {
 
-    @Autowired
-    private TopicoRepository repository;
+    private final TopicoRepository repository;
 
     @Transactional
     public Topico crearTopico(DatosRegistroTopico datos, Usuario autor) {

@@ -10,23 +10,19 @@ import com.fabio.forohub.domain.topico.TopicoRepository;
 import com.fabio.forohub.domain.usuario.Usuario;
 import com.fabio.forohub.domain.usuario.UsuarioRepository;
 import com.fabio.forohub.infra.exception.ValidacionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class RespuestaService {
 
-    @Autowired
-    private RespuestaRepository respuestaRepository;
-
-    @Autowired
-    private TopicoRepository topicoRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final RespuestaRepository respuestaRepository;
+    private final TopicoRepository topicoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public Respuesta crearRespuesta(DatosRegistroRespuesta datos, Usuario autor) {

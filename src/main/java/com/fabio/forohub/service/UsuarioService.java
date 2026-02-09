@@ -6,15 +6,15 @@ import com.fabio.forohub.domain.usuario.UsuarioRepository;
 import com.fabio.forohub.domain.usuario.dto.DatosActualizacionEmail;
 import com.fabio.forohub.infra.exception.ValidacionException;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public Usuario actualizarEmail(@Valid DatosActualizacionEmail datos, Long usuarioId) {

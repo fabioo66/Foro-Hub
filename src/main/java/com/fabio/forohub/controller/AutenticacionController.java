@@ -6,7 +6,7 @@ import com.fabio.forohub.domain.usuario.dto.DatosRespuestaUsuario;
 import com.fabio.forohub.infra.security.DatosTokenJWT;
 import com.fabio.forohub.service.AutenticacionService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +16,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AutenticacionController {
 
-    @Autowired
-    private AutenticacionService autenticacionService;
+    private final AutenticacionService autenticacionService;
 
     @PostMapping("/login")
     public ResponseEntity<DatosTokenJWT> iniciarSesion(@RequestBody @Valid DatosLoginUsuario datos) {
