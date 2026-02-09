@@ -26,8 +26,13 @@ public class TopicoController {
     @Autowired
     private TopicoService topicoService;
 
+
     @PostMapping
-    public ResponseEntity<DatosDetalleTopico> registrarTopico(@RequestBody @Valid DatosRegistroTopico datos, UriComponentsBuilder uriComponentsBuilder, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+    public ResponseEntity<DatosDetalleTopico> registrarTopico(
+            @RequestBody @Valid DatosRegistroTopico datos,
+            @AuthenticationPrincipal Usuario usuarioAutenticado,
+            UriComponentsBuilder uriComponentsBuilder
+    ) {
         var topico = topicoService.crearTopico(datos, usuarioAutenticado);
 
         var uri = uriComponentsBuilder.path("/topicos/{id}")
@@ -37,7 +42,9 @@ public class TopicoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<DatosListaTopico>> listarTopicos(@PageableDefault(size = 10, sort = {"fechaCreacion"}, direction = Sort.Direction.ASC) Pageable paginacion) {
+    public ResponseEntity<Page<DatosListaTopico>> listarTopicos(
+            @PageableDefault(size = 10, sort = {"fechaCreacion"}, direction = Sort.Direction.ASC) Pageable paginacion
+    ) {
         var page = topicoService.listarTopicos(paginacion);
         return ResponseEntity.ok(page);
     }
@@ -48,14 +55,22 @@ public class TopicoController {
         return ResponseEntity.ok(detalle);
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<DatosDetalleTopico> actualizarTopico(@PathVariable Long id, @RequestBody @Valid DatosActualizacionTopico datos, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+    public ResponseEntity<DatosDetalleTopico> actualizarTopico(
+            @PathVariable Long id,
+            @RequestBody @Valid DatosActualizacionTopico datos,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
+    ) {
         var detalle = topicoService.actualizarTopico(id, datos, usuarioAutenticado);
         return ResponseEntity.ok(detalle);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarTopico(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+    public ResponseEntity<Void> eliminarTopico(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
+    ) {
         topicoService.eliminarTopico(id, usuarioAutenticado);
         return ResponseEntity.noContent().build();
     }
