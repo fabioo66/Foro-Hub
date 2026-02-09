@@ -34,18 +34,22 @@
 
 ## 📝 Descripción del Proyecto
 
-**ForoHub API** es una API REST robusta y escalable desarrollada con Spring Boot que permite la gestión completa de un sistema de foros de discusión. La plataforma proporciona un backend completo para crear, listar, actualizar y eliminar tópicos de discusión, con un sistema de autenticación seguro basado en JWT (JSON Web Tokens).
+**ForoHub API** es una API REST robusta y escalable desarrollada con Spring Boot que permite la gestión completa de un sistema de foros de discusión. La plataforma proporciona un backend completo para crear, listar, actualizar y eliminar tópicos de discusión, responder a tópicos, gestionar usuarios y cuenta con un sistema de autenticación seguro basado en JWT (JSON Web Tokens).
 
 ### ¿Para qué sirve?
 
 Este proyecto está diseñado para ser el backend de una plataforma de foros donde los usuarios pueden:
-- 💬 Crear y gestionar tópicos de discusión
-- 🔐 Autenticarse de forma segura
-- 📊 Consultar tópicos con paginación
-- ✏️ Actualizar el estado de las discusiones
-- 🗑️ Eliminar tópicos (borrado lógico)
+- 💬 **Crear y gestionar tópicos de discusión** sobre diferentes cursos
+- 💭 **Responder a tópicos** y participar en discusiones
+- ✅ **Marcar respuestas como solución** (solo el autor del tópico)
+- 🔐 **Autenticarse de forma segura** con JWT
+- 👤 **Gestionar su cuenta** (actualizar email, eliminar cuenta)
+- 📊 **Consultar tópicos y respuestas** con paginación y filtros
+- ✏️ **Actualizar el estado** de tópicos (ABIERTO/CERRADO)
+- 🗑️ **Eliminar contenido** (borrado lógico que mantiene integridad referencial)
+- 🔒 **Protección de datos**: Solo el autor puede modificar/eliminar su contenido
 
-La API implementa las mejores prácticas de desarrollo, incluyendo validaciones, manejo de excepciones, seguridad con Spring Security, documentación automática con Swagger/OpenAPI y migraciones de base de datos con Flyway.
+La API implementa las mejores prácticas de desarrollo, incluyendo validaciones robustas, manejo centralizado de excepciones, seguridad con Spring Security, documentación automática con Swagger/OpenAPI, migraciones de base de datos con Flyway e inyección de dependencias por constructor para código limpio y testeable.
 
 ---
 
@@ -62,23 +66,39 @@ La API implementa las mejores prácticas de desarrollo, incluyendo validaciones,
 **Versión Actual:** v0.0.1-SNAPSHOT
 
 ### ✅ Funcionalidades Implementadas:
-- ✔️ Sistema de autenticación con JWT
-- ✔️ CRUD completo de tópicos
-- ✔️ Paginación y ordenamiento de resultados
-- ✔️ Validaciones de datos
-- ✔️ Seguridad con Spring Security
-- ✔️ Documentación Swagger/OpenAPI
-- ✔️ Migraciones de base de datos con Flyway
+- ✔️ **Sistema de Autenticación JWT**: Login seguro con tokens JWT
+- ✔️ **Registro de Usuarios**: Endpoint para crear nuevos usuarios con validación de email único
+- ✔️ **CRUD Completo de Tópicos**: Crear, listar, actualizar y eliminar tópicos
+- ✔️ **CRUD Completo de Respuestas**: Sistema de respuestas a tópicos con gestión completa
+- ✔️ **Gestión de Usuarios**: Actualización de email y eliminación de cuenta
+- ✔️ **Validación de Propietario**: Solo el autor puede modificar/eliminar sus tópicos y respuestas
+- ✔️ **Sistema de Soluciones**: Marcar respuestas como solución (solo el autor del tópico)
+- ✔️ **Borrado Lógico**: Los registros se desactivan en lugar de eliminarse físicamente
+- ✔️ **Deshabilitación en Cascada**: Al eliminar usuario/tópico se deshabilitan sus respuestas
+- ✔️ **Paginación y Ordenamiento**: Listados eficientes con soporte de paginación
+- ✔️ **Filtros Avanzados**: Listar respuestas por tópico, usuario o ambos
+- ✔️ **Validaciones Robustas**: Validación de datos con Bean Validation
+- ✔️ **Prevención de Duplicados**: Validación de tópicos duplicados (título + mensaje)
+- ✔️ **Seguridad Spring Security**: Protección de endpoints con JWT
+- ✔️ **Manejo de Errores Centralizado**: Sistema global de excepciones con mensajes claros
+- ✔️ **Manejo de Usuarios Deshabilitados**: Mensaje específico al intentar login con cuenta inactiva
+- ✔️ **Documentación Swagger/OpenAPI**: Interfaz interactiva para probar endpoints
+- ✔️ **Migraciones con Flyway**: Control de versiones de base de datos
+- ✔️ **Inyección de Dependencias por Constructor**: Código limpio usando Lombok @RequiredArgsConstructor
+- ✔️ **Estados de Tópicos**: Sistema de estados (ABIERTO, CERRADO)
+- ✔️ **Relaciones Bidireccionales**: Usuario-Tópicos, Usuario-Respuestas, Tópico-Respuestas
 
 ### 🚧 Próximas Características:
-- ⏳ **Sistema de Respuestas**: Implementar respuestas completas a los tópicos con jerarquía de comentarios
-- ⏳ **Gestión de Usuarios**: CRUD completo de usuarios con roles y permisos
-- ⏳ **Perfiles de Usuario**: Perfiles personalizables con información adicional
+- ⏳ **Verificación por Email**: Sistema de verificación por correo para actualización de email y contraseña
+- ⏳ **Recuperación de Contraseña**: Funcionalidad de "olvidé mi contraseña" con token por email
+- ⏳ **Entidad Curso**: Implementar entidad Course para asociar tópicos a cursos específicos
+- ⏳ **Sistema de Roles**: Roles de usuario (USER, ADMIN, MODERATOR) con permisos diferenciados
+- ⏳ **Tests Unitarios**: Cobertura completa de tests unitarios y de integración
 - ⏳ Sistema de votación (upvotes/downvotes)
-- ⏳ Búsqueda avanzada de tópicos con filtros
+- ⏳ Búsqueda avanzada de tópicos con filtros múltiples
 - ⏳ Notificaciones en tiempo real
 - ⏳ Sistema de etiquetas/tags para tópicos
-- ⏳ Tests unitarios y de integración completos
+- ⏳ Perfiles de usuario personalizables
 
 ---
 
@@ -89,9 +109,9 @@ La API implementa las mejores prácticas de desarrollo, incluyendo validaciones,
 La API utiliza JWT para autenticación segura:
 
 ```json
-POST /login
+POST /auth/login
 {
-  "username": "usuario@ejemplo.com",
+  "email": "usuario@ejemplo.com",
   "password": "contraseña123"
 }
 
@@ -110,7 +130,6 @@ Headers: Authorization: Bearer {token}
 {
   "titulo": "¿Cómo implementar Spring Security?",
   "mensaje": "Necesito ayuda para configurar Spring Security en mi proyecto",
-  "autor": "Juan Pérez",
   "curso": "Spring Boot Avanzado"
 }
 ```
@@ -123,6 +142,27 @@ Headers: Authorization: Bearer {token}
 ```
 
 Respuesta paginada con información de los tópicos activos, ordenados por fecha de creación.
+
+### 💭 Crear una Respuesta
+
+```json
+POST /respuestas
+Headers: Authorization: Bearer {token}
+
+{
+  "idTopico": 1,
+  "mensaje": "Puedes seguir esta guía oficial de Spring Security..."
+}
+```
+
+### ✅ Marcar Respuesta como Solución
+
+```http
+PATCH /respuestas/{id}/solucion
+Headers: Authorization: Bearer {token}
+```
+
+Solo el autor del tópico puede marcar respuestas como solución.
 
 ### ✏️ Actualizar un Tópico
 
@@ -144,7 +184,7 @@ DELETE /topicos/{id}
 Headers: Authorization: Bearer {token}
 ```
 
-Implementa borrado lógico, marcando el tópico como inactivo sin eliminarlo físicamente de la base de datos.
+Implementa borrado lógico, marcando el tópico como inactivo sin eliminarlo físicamente de la base de datos. También deshabilita todas las respuestas asociadas.
 
 ---
 
@@ -214,15 +254,23 @@ spring-boot-devtools
 ## ⚡ Características Principales
 
 - 🔒 **Seguridad Robusta**: Implementación completa de Spring Security con JWT
-- 📄 **Paginación**: Listado eficiente de tópicos con soporte para paginación
+- 🔐 **Autenticación y Registro**: Sistema completo de login y registro de usuarios
+- 💭 **Sistema de Respuestas**: Respuestas completas a tópicos con validación de propietario
+- ✅ **Soluciones**: Marcar respuestas como solución (solo autor del tópico)
+- 👤 **Gestión de Usuarios**: Actualización de email y eliminación de cuenta
+- 📄 **Paginación**: Listado eficiente de tópicos y respuestas con soporte para paginación
+- 🔍 **Filtros Avanzados**: Listar respuestas por tópico, usuario o combinación
 - ✅ **Validaciones**: Validación de datos de entrada con Bean Validation
 - 🗃️ **Migraciones**: Control de versiones de base de datos con Flyway
 - 📖 **Documentación Automática**: Swagger UI para probar endpoints
-- 🛡️ **Manejo de Errores**: Sistema centralizado de manejo de excepciones
+- 🛡️ **Manejo de Errores**: Sistema centralizado de manejo de excepciones con mensajes claros
 - 🔄 **Borrado Lógico**: Los registros se desactivan en lugar de eliminarse
+- 🔗 **Deshabilitación en Cascada**: Al eliminar usuario/tópico se deshabilitan sus dependencias
 - 🎯 **RESTful**: Diseño de API siguiendo principios REST
 - 🔍 **Validación de Duplicados**: Prevención de tópicos duplicados
 - 📊 **Estados de Tópicos**: Sistema de estados (ABIERTO, CERRADO)
+- 🧩 **Código Limpio**: Inyección de dependencias por constructor con Lombok
+- 🔐 **Usuarios Deshabilitados**: Manejo específico de cuentas inactivas
 
 ---
 
@@ -320,47 +368,117 @@ Authorization: Bearer {tu_token_jwt}
 
 ### 📍 Endpoints Disponibles
 
+#### 🔐 Autenticación
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
-| POST | `/login` | Iniciar sesión y obtener token | ❌ No |
+| POST | `/auth/login` | Iniciar sesión y obtener token | ❌ No |
+| POST | `/auth/register` | Registrar un nuevo usuario | ❌ No |
+
+#### 📝 Tópicos
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
 | POST | `/topicos` | Crear un nuevo tópico | ✅ Sí |
 | GET | `/topicos` | Listar todos los tópicos (paginado) | ✅ Sí |
 | GET | `/topicos/{id}` | Obtener un tópico específico | ✅ Sí |
-| PUT | `/topicos/{id}` | Actualizar un tópico | ✅ Sí |
-| DELETE | `/topicos/{id}` | Eliminar un tópico (borrado lógico) | ✅ Sí |
+| PUT | `/topicos/{id}` | Actualizar un tópico (solo autor) | ✅ Sí |
+| DELETE | `/topicos/{id}` | Eliminar un tópico (solo autor) | ✅ Sí |
+
+#### 💭 Respuestas
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| POST | `/respuestas` | Crear una respuesta a un tópico | ✅ Sí |
+| GET | `/respuestas` | Listar respuestas (con filtros) | ✅ Sí |
+| GET | `/respuestas/{id}` | Obtener una respuesta específica | ✅ Sí |
+| PUT | `/respuestas/{id}` | Actualizar una respuesta (solo autor) | ✅ Sí |
+| PATCH | `/respuestas/{id}/solucion` | Marcar respuesta como solución | ✅ Sí |
+| DELETE | `/respuestas/{id}` | Eliminar una respuesta (solo autor) | ✅ Sí |
+
+#### 👤 Usuarios
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| PUT | `/usuarios` | Actualizar email del usuario | ✅ Sí |
+| DELETE | `/usuarios` | Eliminar cuenta (borrado lógico) | ✅ Sí |
 
 ### 📝 Ejemplos de Uso
 
-#### Obtener Token de Autenticación
+#### 🔐 Registro de Usuario
 
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "usuario@ejemplo.com",
+    "nombre": "Juan Pérez",
+    "email": "juan@ejemplo.com",
     "password": "password123"
   }'
 ```
 
-#### Crear un Tópico
+#### 🔑 Obtener Token de Autenticación
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "juan@ejemplo.com",
+    "password": "password123"
+  }'
+```
+
+#### 📝 Crear un Tópico
 
 ```bash
 curl -X POST http://localhost:8080/topicos \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
-    "titulo": "Mi primer tópico",
-    "mensaje": "Este es el contenido del tópico",
-    "autor": "Fabio Torres",
-    "curso": "Spring Boot"
+    "titulo": "¿Cómo implementar Spring Security?",
+    "mensaje": "Necesito ayuda para configurar Spring Security",
+    "curso": "Spring Boot Avanzado"
   }'
 ```
 
-#### Listar Tópicos
+#### 📖 Listar Tópicos
 
 ```bash
-curl -X GET "http://localhost:8080/topicos?page=0&size=10" \
+curl -X GET "http://localhost:8080/topicos?page=0&size=10&sort=fechaCreacion,asc" \
   -H "Authorization: Bearer {token}"
+```
+
+#### 💭 Crear una Respuesta
+
+```bash
+curl -X POST http://localhost:8080/respuestas \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "idTopico": 1,
+    "mensaje": "Puedes seguir esta guía oficial..."
+  }'
+```
+
+#### 🔍 Listar Respuestas por Tópico
+
+```bash
+curl -X GET "http://localhost:8080/respuestas?idTopico=1&page=0&size=10" \
+  -H "Authorization: Bearer {token}"
+```
+
+#### ✅ Marcar Respuesta como Solución
+
+```bash
+curl -X PATCH http://localhost:8080/respuestas/1/solucion \
+  -H "Authorization: Bearer {token}"
+```
+
+#### 👤 Actualizar Email del Usuario
+
+```bash
+curl -X PUT http://localhost:8080/usuarios \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "nuevo@ejemplo.com"
+  }'
 ```
 
 ---
@@ -373,38 +491,64 @@ forohub-api/
 │   ├── 📂 main/
 │   │   ├── 📂 java/com/fabio/forohub/
 │   │   │   ├── 📄 ForohubApiApplication.java      # Clase principal
-│   │   │   ├── 📄 ValidacionException.java        # Excepción personalizada
 │   │   │   ├── 📂 controller/
 │   │   │   │   ├── 📄 AutenticacionController.java
-│   │   │   │   └── 📄 TopicoController.java
+│   │   │   │   ├── 📄 TopicoController.java
+│   │   │   │   ├── 📄 RespuestaController.java
+│   │   │   │   └── 📄 UsuarioController.java
 │   │   │   ├── 📂 domain/
 │   │   │   │   ├── 📂 topico/
 │   │   │   │   │   ├── 📄 Topico.java             # Entidad
 │   │   │   │   │   ├── 📄 TopicoRepository.java   # Repositorio JPA
-│   │   │   │   │   ├── 📄 CrearTopico.java        # Servicio
-│   │   │   │   │   ├── 📄 DatosRegistroTopico.java
-│   │   │   │   │   ├── 📄 DatosActualizacionTopico.java
-│   │   │   │   │   ├── 📄 DatosDetalleTopico.java
-│   │   │   │   │   ├── 📄 DatosListaTopico.java
-│   │   │   │   │   └── 📄 Estado.java             # Enum
+│   │   │   │   │   ├── 📄 Estado.java             # Enum
+│   │   │   │   │   └── 📂 dto/
+│   │   │   │   │       ├── 📄 DatosRegistroTopico.java
+│   │   │   │   │       ├── 📄 DatosActualizacionTopico.java
+│   │   │   │   │       ├── 📄 DatosDetalleTopico.java
+│   │   │   │   │       └── 📄 DatosListaTopico.java
+│   │   │   │   ├── 📂 respuesta/
+│   │   │   │   │   ├── 📄 Respuesta.java          # Entidad
+│   │   │   │   │   ├── 📄 RespuestaRepository.java
+│   │   │   │   │   └── 📂 dto/
+│   │   │   │   │       ├── 📄 DatosRegistroRespuesta.java
+│   │   │   │   │       ├── 📄 DatosActualizacionRespuesta.java
+│   │   │   │   │       └── 📄 DatosDetalleRespuesta.java
 │   │   │   │   └── 📂 usuario/
 │   │   │   │       ├── 📄 Usuario.java
 │   │   │   │       ├── 📄 UsuarioRepository.java
-│   │   │   │       ├── 📄 AutenticacionService.java
-│   │   │   │       └── 📄 DatosRegistroUsuario.java
+│   │   │   │       └── 📂 dto/
+│   │   │   │           ├── 📄 DatosRegistroUsuario.java
+│   │   │   │           ├── 📄 DatosLoginUsuario.java
+│   │   │   │           ├── 📄 DatosActualizacionEmail.java
+│   │   │   │           └── 📄 DatosRespuestaUsuario.java
+│   │   │   ├── 📂 service/
+│   │   │   │   ├── 📄 AutenticacionService.java
+│   │   │   │   ├── 📄 TopicoService.java
+│   │   │   │   ├── 📄 RespuestaService.java
+│   │   │   │   ├── 📄 UsuarioService.java
+│   │   │   │   └── 📄 UsuarioDetailsService.java
 │   │   │   └── 📂 infra/
+│   │   │       ├── 📂 exception/
+│   │   │       │   ├── 📄 GlobalExceptionHandler.java
+│   │   │       │   ├── 📄 ErrorResponse.java
+│   │   │       │   └── 📄 ValidacionException.java
 │   │   │       ├── 📂 security/
 │   │   │       │   ├── 📄 SecurityConfigurations.java
 │   │   │       │   ├── 📄 SecurityFilter.java
 │   │   │       │   ├── 📄 TokenService.java
-│   │   │       │   └── 📄 DatosTokenJWT.java
+│   │   │       │   ├── 📄 DatosTokenJWT.java
+│   │   │       │   ├── 📄 CustomAuthenticationEntryPoint.java
+│   │   │       │   └── 📄 CustomAccessDeniedHandler.java
 │   │   │       └── 📂 springdoc/
 │   │   │           └── 📄 SpringDocConfiguration.java
 │   │   └── 📂 resources/
 │   │       ├── 📄 application.properties
 │   │       └── 📂 db/migration/
 │   │           ├── 📄 V1__create-table-topicos.sql
-│   │           └── 📄 V2__create-table-usuarios.sql
+│   │           ├── 📄 V2__create-table-usuarios.sql
+│   │           ├── 📄 V3__add-autor-to-topicos.sql
+│   │           ├── 📄 V4__create-table-respuestas.sql
+│   │           └── 📄 V5__add-activo-to-usuarios.sql
 │   └── 📂 test/
 │       └── 📂 java/com/fabio/forohub/
 │           └── 📄 ForohubApiApplicationTests.java
@@ -415,12 +559,23 @@ forohub-api/
 
 ### 🏗️ Arquitectura del Proyecto
 
-El proyecto sigue una arquitectura en capas:
+El proyecto sigue una arquitectura en capas limpia y escalable:
 
 - **Controller**: Capa de presentación (REST endpoints)
-- **Domain**: Lógica de negocio y entidades
-- **Repository**: Capa de acceso a datos
-- **Infra**: Configuración de infraestructura (seguridad, documentación)
+- **Service**: Lógica de negocio y orquestación
+- **Domain**: Entidades, repositorios y DTOs
+- **Infra**: Configuración de infraestructura (seguridad, documentación, excepciones)
+
+### 🔧 Patrones y Buenas Prácticas Implementadas:
+
+- ✅ **Inyección de Dependencias por Constructor**: Usando Lombok @RequiredArgsConstructor
+- ✅ **DTOs (Data Transfer Objects)**: Separación clara entre entidades y datos de API
+- ✅ **Repository Pattern**: Abstracción de acceso a datos con Spring Data JPA
+- ✅ **Service Layer**: Lógica de negocio separada de los controllers
+- ✅ **Exception Handling Global**: Manejo centralizado de errores
+- ✅ **Validaciones**: Bean Validation en DTOs
+- ✅ **Security Filter Chain**: Autenticación JWT con Spring Security
+- ✅ **Migraciones Versionadas**: Control de esquema con Flyway
 
 ---
 
@@ -431,10 +586,10 @@ El proyecto sigue una arquitectura en capas:
 Una vez que la aplicación esté en ejecución, puedes acceder a la documentación interactiva de Swagger:
 
 ```
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html#/
 ```
 
-Desde aquí puedes:
+Desde aquí podes:
 - 📋 Ver todos los endpoints disponibles
 - 🧪 Probar las peticiones directamente
 - 📝 Ver los modelos de datos
