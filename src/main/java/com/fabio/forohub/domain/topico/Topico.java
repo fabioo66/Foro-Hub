@@ -1,5 +1,6 @@
 package com.fabio.forohub.domain.topico;
 
+import com.fabio.forohub.domain.curso.Curso;
 import com.fabio.forohub.domain.respuesta.Respuesta;
 import com.fabio.forohub.domain.topico.dto.DatosActualizacionTopico;
 import com.fabio.forohub.domain.topico.dto.DatosRegistroTopico;
@@ -30,19 +31,22 @@ public class Topico {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     @ManyToOne
+    @JoinColumn(name = "autor_id")
     private Usuario autor;
-    private String curso;
+    @ManyToOne
+    @JoinColumn(name = "curso_id")
+    private Curso curso;
     @OneToMany(mappedBy = "topico", cascade = CascadeType.ALL)
     private List<Respuesta> respuestas;
 
-    public Topico(DatosRegistroTopico datos, Usuario autor) {
+    public Topico(DatosRegistroTopico datos, Usuario autor, Curso curso) {
         this.activo = true;
         this.titulo = datos.titulo();
         this.mensaje = datos.mensaje();
         this.fechaCreacion = LocalDateTime.now();
         this.estado = Estado.ABIERTO;
         this.autor = autor;
-        this.curso = datos.curso();
+        this.curso = curso;
         this.respuestas = new ArrayList<>();
     }
 
