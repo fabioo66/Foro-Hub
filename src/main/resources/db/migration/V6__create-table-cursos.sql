@@ -1,0 +1,8 @@
+CREATE TABLE cursos (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    activo TINYINT NOT NULL,
+    nombre VARCHAR(255) NOT NULL UNIQUE,
+    categoria VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (id)
+);
