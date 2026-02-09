@@ -1,5 +1,6 @@
 package com.fabio.forohub.domain.topico;
 
+import com.fabio.forohub.domain.respuesta.Respuesta;
 import com.fabio.forohub.domain.topico.dto.DatosActualizacionTopico;
 import com.fabio.forohub.domain.topico.dto.DatosRegistroTopico;
 import com.fabio.forohub.domain.usuario.Usuario;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "Topico")
 @Table(name = "topicos")
@@ -26,11 +29,11 @@ public class Topico {
     private LocalDateTime fechaCreacion;
     @Enumerated(EnumType.STRING)
     private Estado estado;
-
     @ManyToOne
     private Usuario autor;
-
     private String curso;
+    @OneToMany(mappedBy = "topico", cascade = CascadeType.ALL)
+    private List<Respuesta> respuestas;
 
     public Topico(DatosRegistroTopico datos, Usuario autor) {
         this.activo = true;
@@ -40,6 +43,7 @@ public class Topico {
         this.estado = Estado.ABIERTO;
         this.autor = autor;
         this.curso = datos.curso();
+        this.respuestas = new ArrayList<>();
     }
 
     public void actualizarInformaciones(DatosActualizacionTopico datos) {
@@ -56,5 +60,13 @@ public class Topico {
 
     public void deshabilitar() {
         this.activo = false;
+
+        this.respuestas.stream()
+                .filter(Respuesta::isActivo)
+                .forEach(Respuesta::deshabilitar);
+    }
+
+    public void agregarRespuesta(Respuesta respuesta) {
+        this.respuestas.add(respuesta);
     }
 }
