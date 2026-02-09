@@ -1,0 +1,16 @@
+package com.fabio.forohub.domain.curso;
+
+public enum Categoria {
+    PROGRAMACION,
+    BACKEND,
+    FRONTEND,
+    BASES_DE_DATOS,
+    DESARROLLO_WEB,
+    INTELIGENCIA_ARTIFICIAL,
+    CIENCIA_DE_DATOS,
+    SEGURIDAD_INFORMATICA,
+    REDES,
+    SISTEMAS_OPERATIVOS,
+    DESARROLLO_MOVIL,
+    CLOUD_COMPUTING
+}
