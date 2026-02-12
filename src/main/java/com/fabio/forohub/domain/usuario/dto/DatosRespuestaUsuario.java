@@ -1,13 +1,15 @@
 package com.fabio.forohub.domain.usuario.dto;
 
+import com.fabio.forohub.domain.usuario.Rol;
 import com.fabio.forohub.domain.usuario.Usuario;
 
 public record DatosRespuestaUsuario(
         Long id,
         String nombre,
-        String email
+        String email,
+        Rol rol
 ) {
     public DatosRespuestaUsuario(Usuario usuario) {
-        this(usuario.getId(), usuario.getNombre(), usuario.getEmail());
+        this(usuario.getId(), usuario.getNombre(), usuario.getEmail(), usuario.getRol());
     }
 }

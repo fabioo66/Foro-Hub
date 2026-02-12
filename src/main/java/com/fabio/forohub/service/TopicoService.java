@@ -9,6 +9,7 @@ import com.fabio.forohub.domain.topico.dto.DatosDetalleTopico;
 import com.fabio.forohub.domain.topico.dto.DatosListaTopico;
 import com.fabio.forohub.domain.topico.dto.DatosRegistroTopico;
 import com.fabio.forohub.domain.usuario.Usuario;
+import com.fabio.forohub.infra.security.PermissionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ public class TopicoService {
 
     private final TopicoRepository topicoRepository;
     private final CursoRepository cursoRepository;
+    private final PermissionValidator permissionValidator;
 
     @Transactional
     public Topico crearTopico(DatosRegistroTopico datos, Usuario autor) {
@@ -45,6 +47,14 @@ public class TopicoService {
     @Transactional
     public DatosDetalleTopico actualizarTopico(Long id, DatosActualizacionTopico datos, Usuario usuario) {
         var topico = validarPropietario(id, usuario);
+
+        // Validar cambio de estado a CERRADO - solo MODERATOR y ADMIN
+        if (datos.estado() != null && datos.estado() == Estado.CERRADO) {
+            if (!permissionValidator.tienePrivilegiosElevados(usuario)) {
+                throw new ValidacionException("Solo moderadores y administradores pueden cerrar tópicos.");
+            }
+        }
+
         validarTopicoUnico(datos.titulo(), datos.mensaje(), id);
         topico.actualizarInformaciones(datos);
         return new DatosDetalleTopico(topico);
@@ -61,9 +71,11 @@ public class TopicoService {
         var topico = topicoRepository.findById(topicoId)
                 .orElseThrow(() -> new ValidacionException("Tópico no encontrado"));
 
-        if (!topico.getAutor().getId().equals(usuario.getId())) {
-            throw new ValidacionException("No tenes permiso para realizar esta operación.");
-        }
+        permissionValidator.validarPermisoModificacion(
+                usuario,
+                topico.getAutor().getId(),
+                "No tenes permiso para realizar esta operación."
+        );
 
         return topico;
     }

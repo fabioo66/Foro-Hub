@@ -14,9 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import static com.fabio.forohub.infra.security.RoleConstants.*;
 
 @RequestMapping("/topicos")
 @RestController
@@ -28,6 +31,7 @@ public class TopicoController {
 
 
     @PostMapping
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<DatosDetalleTopico> registrarTopico(
             @RequestBody @Valid DatosRegistroTopico datos,
             @AuthenticationPrincipal Usuario usuarioAutenticado,
@@ -57,6 +61,7 @@ public class TopicoController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<DatosDetalleTopico> actualizarTopico(
             @PathVariable Long id,
             @RequestBody @Valid DatosActualizacionTopico datos,
@@ -67,6 +72,7 @@ public class TopicoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<Void> eliminarTopico(
             @PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioAutenticado

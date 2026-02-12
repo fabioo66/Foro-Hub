@@ -13,9 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import static com.fabio.forohub.infra.security.RoleConstants.*;
 
 @RequestMapping("/respuestas")
 @RestController
@@ -26,6 +29,7 @@ public class RespuestaController {
     private final RespuestaService respuestaService;
 
     @PostMapping
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<DatosDetalleRespuesta> registrarRespuesta(
             @RequestBody @Valid DatosRegistroRespuesta datos,
             @AuthenticationPrincipal Usuario usuarioAutenticado,
@@ -56,6 +60,7 @@ public class RespuestaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<DatosDetalleRespuesta> actualizarRespuesta(
             @PathVariable Long id,
             @RequestBody @Valid DatosActualizacionRespuesta datos,
@@ -66,6 +71,7 @@ public class RespuestaController {
     }
 
     @PatchMapping("/{id}/solucion")
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<DatosDetalleRespuesta> marcarComoSolucion(
             @PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioAutenticado
@@ -75,6 +81,7 @@ public class RespuestaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(HAS_ROLE_USER_OR_MODERATOR)
     public ResponseEntity<Void> eliminarRespuesta(
             @PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioAutenticado

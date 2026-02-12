@@ -8,6 +8,7 @@ import com.fabio.forohub.domain.curso.dto.DatosDetalleCurso;
 import com.fabio.forohub.domain.curso.dto.DatosRegistroCurso;
 import com.fabio.forohub.domain.usuario.Usuario;
 import com.fabio.forohub.infra.exception.ValidacionException;
+import com.fabio.forohub.infra.security.PermissionValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,14 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class CursoService {
 
     private final CursoRepository cursoRepository;
+    private final PermissionValidator permissionValidator;
 
-    // El autor lo voy a usar cuando agregue la funcionalidad de que solo los administradores pueden crear cursos
     @Transactional
     public Curso crearCurso(@Valid DatosRegistroCurso datos, Usuario usuarioAutenticado) {
-        /*
-        validarAdministrador(curso, usuarioAutenticado);
-         */
-
+        permissionValidator.validarEsAdmin(usuarioAutenticado);
         validarCursoNoExiste(datos.nombre());
 
         var curso = new Curso(datos);
@@ -53,11 +51,9 @@ public class CursoService {
 
     @Transactional
     public DatosDetalleCurso actualizarCurso(Long id, @Valid DatosActualizacionCurso datos, Usuario usuarioAutenticado) {
+        permissionValidator.validarEsAdmin(usuarioAutenticado);
         var curso = cursoValido(id);
 
-        /*
-        validarAdministrador(curso, usuarioAutenticado);
-         */
 
         if (!curso.getNombre().equals(datos.nombre())) {
             validarCursoNoExiste(datos.nombre());
@@ -65,6 +61,16 @@ public class CursoService {
 
         curso.actualizarInformaciones(datos);
         return new DatosDetalleCurso(curso);
+    }
+
+    @Transactional
+    public void eliminarCurso(Long id, Usuario usuarioAutenticado) {
+        permissionValidator.validarEsAdmin(usuarioAutenticado);
+        var curso = cursoValido(id);
+
+
+        curso.deshabilitar();
+        cursoRepository.save(curso);
     }
 
     private Curso cursoValido(Long id) {
@@ -78,16 +84,5 @@ public class CursoService {
                 .ifPresent(c -> {
                     throw new ValidacionException("Ya existe un curso activo con ese nombre");
                 });
-    }
-
-    public void eliminarCurso(Long id, Usuario usuarioAutenticado) {
-        var curso = cursoValido(id);
-
-        /*
-        validarAdministrador(curso, usuarioAutenticado);
-         */
-
-        curso.deshabilitar();
-        cursoRepository.save(curso);
     }
 }

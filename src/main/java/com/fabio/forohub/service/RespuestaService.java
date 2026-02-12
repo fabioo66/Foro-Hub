@@ -10,6 +10,7 @@ import com.fabio.forohub.domain.topico.TopicoRepository;
 import com.fabio.forohub.domain.usuario.Usuario;
 import com.fabio.forohub.domain.usuario.UsuarioRepository;
 import com.fabio.forohub.infra.exception.ValidacionException;
+import com.fabio.forohub.infra.security.PermissionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ public class RespuestaService {
     private final RespuestaRepository respuestaRepository;
     private final TopicoRepository topicoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PermissionValidator permissionValidator;
 
     @Transactional
     public Respuesta crearRespuesta(DatosRegistroRespuesta datos, Usuario autor) {
@@ -80,9 +82,11 @@ public class RespuestaService {
     ) {
         var respuesta = obtenerRespuestaActiva(id);
 
-        if (!respuesta.getAutor().getId().equals(usuarioAutenticado.getId())) {
-            throw new ValidacionException("No tienes permiso para actualizar esta respuesta");
-        }
+        permissionValidator.validarPermisoModificacion(
+                usuarioAutenticado,
+                respuesta.getAutor().getId(),
+                "No tienes permiso para actualizar esta respuesta"
+        );
 
         respuesta.setMensaje(datos.mensaje());
         return respuesta;
@@ -92,8 +96,12 @@ public class RespuestaService {
     public Respuesta marcarComoSolucion(Long idRespuesta, Usuario usuarioAutenticado) {
         var respuesta = obtenerRespuestaActiva(idRespuesta);
 
-        if (!respuesta.getTopico().getAutor().getId().equals(usuarioAutenticado.getId())) {
-            throw new ValidacionException("Solo el autor del tópico puede marcar respuestas como solución");
+        // Solo el autor del tópico, MODERATOR o ADMIN pueden marcar como solución
+        boolean esAutorDelTopico = respuesta.getTopico().getAutor().getId().equals(usuarioAutenticado.getId());
+        boolean tienePrivilegios = permissionValidator.tienePrivilegiosElevados(usuarioAutenticado);
+
+        if (!esAutorDelTopico && !tienePrivilegios) {
+            throw new ValidacionException("Solo el autor del tópico, moderadores o administradores pueden marcar respuestas como solución");
         }
 
         respuesta.marcarComoSolucion();
@@ -104,9 +112,11 @@ public class RespuestaService {
     public void eliminarRespuesta(Long id, Usuario usuarioAutenticado) {
         var respuesta = obtenerRespuestaActiva(id);
 
-        if (!respuesta.getAutor().getId().equals(usuarioAutenticado.getId())) {
-            throw new ValidacionException("No tienes permiso para eliminar esta respuesta");
-        }
+        permissionValidator.validarPermisoModificacion(
+                usuarioAutenticado,
+                respuesta.getAutor().getId(),
+                "No tienes permiso para eliminar esta respuesta"
+        );
 
         respuesta.deshabilitar();
     }

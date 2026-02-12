@@ -1,0 +1,6 @@
+UPDATE usuarios SET rol = 'USER' WHERE rol = 'ROLE_USER';
+UPDATE usuarios SET rol = 'MODERATOR' WHERE rol = 'ROLE_MODERATOR';
+UPDATE usuarios SET rol = 'ADMIN' WHERE rol = 'ROLE_ADMIN';
+
+ALTER TABLE usuarios ALTER COLUMN rol SET DEFAULT 'USER';
+

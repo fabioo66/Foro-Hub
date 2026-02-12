@@ -27,6 +27,8 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private boolean activo;
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
     private String nombre;
     @Setter
     private String email;
@@ -38,6 +40,7 @@ public class Usuario implements UserDetails {
 
     public Usuario(DatosRegistroUsuario datos, String passwordEncriptado) {
         this.activo = true;
+        this.rol = Rol.USER;
         this.nombre = datos.nombre();
         this.email = datos.email();
         this.password = passwordEncriptado;
@@ -47,7 +50,8 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        // Spring Security espera que los roles tengan el prefijo "ROLE_" cuando se usa hasRole()
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.rol.name()));
     }
 
     @Override
