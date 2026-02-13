@@ -34,20 +34,23 @@
 
 ## 📝 Descripción del Proyecto
 
-**ForoHub API** es una API REST robusta y escalable desarrollada con Spring Boot que permite la gestión completa de un sistema de foros de discusión. La plataforma proporciona un backend completo para crear, listar, actualizar y eliminar tópicos de discusión, responder a tópicos, gestionar usuarios y cuenta con un sistema de autenticación seguro basado en JWT (JSON Web Tokens).
+**ForoHub API** es una API REST robusta y escalable desarrollada con Spring Boot que permite la gestión completa de un sistema de foros de discusión. La plataforma proporciona un backend completo para crear, listar, actualizar y eliminar tópicos de discusión, responder a tópicos, gestionar usuarios, administrar cursos y cuenta con un sistema de autenticación seguro basado en JWT (JSON Web Tokens) con control de acceso por roles.
 
 ### ¿Para qué sirve?
 
 Este proyecto está diseñado para ser el backend de una plataforma de foros donde los usuarios pueden:
 - 💬 **Crear y gestionar tópicos de discusión** sobre diferentes cursos
+- 📚 **Gestionar cursos** por categorías (solo administradores)
 - 💭 **Responder a tópicos** y participar en discusiones
-- ✅ **Marcar respuestas como solución** (solo el autor del tópico)
+- ✅ **Marcar respuestas como solución** (autor del tópico o moderadores/admins)
 - 🔐 **Autenticarse de forma segura** con JWT
+- 👥 **Sistema de roles**: USER, MODERATOR, ADMIN con permisos diferenciados
 - 👤 **Gestionar su cuenta** (actualizar email, eliminar cuenta)
-- 📊 **Consultar tópicos y respuestas** con paginación y filtros
+- 📊 **Consultar tópicos, respuestas y cursos** con paginación y filtros
 - ✏️ **Actualizar el estado** de tópicos (ABIERTO/CERRADO)
 - 🗑️ **Eliminar contenido** (borrado lógico que mantiene integridad referencial)
-- 🔒 **Protección de datos**: Solo el autor puede modificar/eliminar su contenido
+- 🔒 **Protección de datos**: Solo el autor puede modificar/eliminar su contenido (o moderadores/admins)
+- 🛡️ **Control de acceso basado en roles**: Permisos específicos por endpoint
 
 La API implementa las mejores prácticas de desarrollo, incluyendo validaciones robustas, manejo centralizado de excepciones, seguridad con Spring Security, documentación automática con Swagger/OpenAPI, migraciones de base de datos con Flyway e inyección de dependencias por constructor para código limpio y testeable.
 
@@ -66,39 +69,85 @@ La API implementa las mejores prácticas de desarrollo, incluyendo validaciones 
 **Versión Actual:** v0.0.1-SNAPSHOT
 
 ### ✅ Funcionalidades Implementadas:
+
+#### 🔐 Autenticación y Seguridad
 - ✔️ **Sistema de Autenticación JWT**: Login seguro con tokens JWT
 - ✔️ **Registro de Usuarios**: Endpoint para crear nuevos usuarios con validación de email único
+- ✔️ **Sistema de Roles**: Implementación completa de roles (USER, MODERATOR, ADMIN)
+- ✔️ **Control de Acceso**: Permisos específicos por rol usando @PreAuthorize
+- ✔️ **Validación de Usuarios Activos**: Solo usuarios habilitados pueden iniciar sesión
+- ✔️ **Manejo de Usuarios Deshabilitados**: Mensaje específico al intentar login con cuenta inactiva
+
+#### 📝 Gestión de Tópicos
 - ✔️ **CRUD Completo de Tópicos**: Crear, listar, actualizar y eliminar tópicos
-- ✔️ **CRUD Completo de Respuestas**: Sistema de respuestas a tópicos con gestión completa
-- ✔️ **Gestión de Usuarios**: Actualización de email y eliminación de cuenta
-- ✔️ **Validación de Propietario**: Solo el autor puede modificar/eliminar sus tópicos y respuestas
-- ✔️ **Sistema de Soluciones**: Marcar respuestas como solución (solo el autor del tópico)
-- ✔️ **Borrado Lógico**: Los registros se desactivan en lugar de eliminarse físicamente
-- ✔️ **Deshabilitación en Cascada**: Al eliminar usuario/tópico se deshabilitan sus respuestas
-- ✔️ **Paginación y Ordenamiento**: Listados eficientes con soporte de paginación
-- ✔️ **Filtros Avanzados**: Listar respuestas por tópico, usuario o ambos
-- ✔️ **Validaciones Robustas**: Validación de datos con Bean Validation
+- ✔️ **Validación de Propietario**: Solo el autor puede modificar/eliminar sus tópicos (o moderadores/admins)
+- ✔️ **Estados de Tópicos**: Sistema de estados (ABIERTO, CERRADO)
 - ✔️ **Prevención de Duplicados**: Validación de tópicos duplicados (título + mensaje)
+- ✔️ **Asociación con Cursos**: Cada tópico pertenece a un curso específico
+- ✔️ **Cierre de Tópicos**: Moderadores y admins pueden cerrar tópicos ajenos
+- ✔️ **Eliminación Protegida**: Moderadores y admins pueden eliminar tópicos ajenos
+
+#### 💭 Sistema de Respuestas
+- ✔️ **CRUD Completo de Respuestas**: Sistema de respuestas a tópicos con gestión completa
+- ✔️ **Sistema de Soluciones**: Marcar respuestas como solución (autor del tópico, moderadores o admins)
+- ✔️ **Filtros Avanzados**: Listar respuestas por tópico, usuario o ambos
+- ✔️ **Validación de Propietario**: Solo el autor puede modificar/eliminar sus respuestas
+- ✔️ **Respuestas Bidireccionales**: Relación completa entre tópicos y respuestas
+
+#### 📚 Gestión de Cursos
+- ✔️ **CRUD Completo de Cursos**: Solo administradores pueden gestionar cursos
+- ✔️ **Categorías de Cursos**: Sistema de categorías con enum (BACKEND, FRONTEND, MOBILE, etc.)
+- ✔️ **Filtrado por Categoría**: Listar cursos por categoría específica
+- ✔️ **Validación de Cursos**: No permitir crear tópicos en cursos inactivos
+- ✔️ **Endpoint de Categorías**: Listar todas las categorías disponibles
+- ✔️ **Borrado Lógico**: Cursos desactivados sin afectar tópicos existentes
+
+#### 👤 Gestión de Usuarios
+- ✔️ **Actualización de Email**: Usuarios pueden actualizar su email con validación de unicidad
+- ✔️ **Eliminación de Cuenta**: Borrado lógico de cuenta del usuario
+- ✔️ **Desactivación por Admin**: Administradores pueden desactivar usuarios
+- ✔️ **Perfil de Usuario**: Endpoint para obtener información del usuario autenticado
+- ✔️ **Listado de Usuarios**: Solo administradores pueden listar todos los usuarios
+- ✔️ **Deshabilitación en Cascada**: Al eliminar usuario se deshabilitan sus tópicos y respuestas
+
+#### 🛡️ Control de Acceso por Roles
+| Acción | USER | MODERATOR | ADMIN |
+|--------|------|-----------|-------|
+| Crear tópico | ✅ | ✅ | ✅ |
+| Responder tópico | ✅ | ✅ | ✅ |
+| Editar su respuesta | ✅ | ✅ | ✅ |
+| Eliminar su respuesta | ✅ | ✅ | ✅ |
+| Marcar solución (autor tópico) | ✅ | ✅ | ✅ |
+| Marcar solución (no autor) | ❌ | ✅ | ✅ |
+| Cerrar tópico ajeno | ❌ | ✅ | ✅ |
+| Eliminar tópico ajeno | ❌ | ✅ | ✅ |
+| CRUD cursos | ❌ | ❌ | ✅ |
+| Desactivar usuarios | ❌ | ❌ | ✅ |
+| Listar usuarios | ❌ | ❌ | ✅ |
+
+#### 🔧 Características Técnicas
+- ✔️ **Paginación y Ordenamiento**: Listados eficientes con soporte de paginación
+- ✔️ **Validaciones Robustas**: Validación de datos con Bean Validation
 - ✔️ **Seguridad Spring Security**: Protección de endpoints con JWT
 - ✔️ **Manejo de Errores Centralizado**: Sistema global de excepciones con mensajes claros
-- ✔️ **Manejo de Usuarios Deshabilitados**: Mensaje específico al intentar login con cuenta inactiva
-- ✔️ **Documentación Swagger/OpenAPI**: Interfaz interactiva para probar endpoints
+- ✔️ **Manejo de Errores Específicos**: Handlers para AuthenticationException, AccessDeniedException, enum inválidos, etc.
+- ✔️ **Documentación Swagger/OpenAPI**: Interfaz interactiva para probar la API
 - ✔️ **Migraciones con Flyway**: Control de versiones de base de datos
 - ✔️ **Inyección de Dependencias por Constructor**: Código limpio usando Lombok @RequiredArgsConstructor
-- ✔️ **Estados de Tópicos**: Sistema de estados (ABIERTO, CERRADO)
-- ✔️ **Relaciones Bidireccionales**: Usuario-Tópicos, Usuario-Respuestas, Tópico-Respuestas
+- ✔️ **Relaciones Bidireccionales**: Usuario-Tópicos, Usuario-Respuestas, Tópico-Respuestas, Curso-Tópicos
+- ✔️ **Borrado Lógico**: Los registros se desactivan en lugar de eliminarse físicamente
+- ✔️ **Deshabilitación en Cascada**: Integridad referencial completa
 
 ### 🚧 Próximas Características:
 - ⏳ **Verificación por Email**: Sistema de verificación por correo para actualización de email y contraseña
 - ⏳ **Recuperación de Contraseña**: Funcionalidad de "olvidé mi contraseña" con token por email
-- ⏳ **Entidad Curso**: Implementar entidad Course para asociar tópicos a cursos específicos
-- ⏳ **Sistema de Roles**: Roles de usuario (USER, ADMIN, MODERATOR) con permisos diferenciados
 - ⏳ **Tests Unitarios**: Cobertura completa de tests unitarios y de integración
 - ⏳ Sistema de votación (upvotes/downvotes)
 - ⏳ Búsqueda avanzada de tópicos con filtros múltiples
 - ⏳ Notificaciones en tiempo real
 - ⏳ Sistema de etiquetas/tags para tópicos
 - ⏳ Perfiles de usuario personalizables
+- ⏳ Estadísticas y métricas del foro
 
 ---
 
@@ -255,22 +304,25 @@ spring-boot-devtools
 
 - 🔒 **Seguridad Robusta**: Implementación completa de Spring Security con JWT
 - 🔐 **Autenticación y Registro**: Sistema completo de login y registro de usuarios
+- 👥 **Sistema de Roles**: Control de acceso basado en roles (USER, MODERATOR, ADMIN)
+- 📚 **Gestión de Cursos**: CRUD completo de cursos con categorías (solo administradores)
 - 💭 **Sistema de Respuestas**: Respuestas completas a tópicos con validación de propietario
-- ✅ **Soluciones**: Marcar respuestas como solución (solo autor del tópico)
-- 👤 **Gestión de Usuarios**: Actualización de email y eliminación de cuenta
-- 📄 **Paginación**: Listado eficiente de tópicos y respuestas con soporte para paginación
-- 🔍 **Filtros Avanzados**: Listar respuestas por tópico, usuario o combinación
+- ✅ **Soluciones**: Marcar respuestas como solución (autor del tópico, moderadores o admins)
+- 👤 **Gestión de Usuarios**: Actualización de email, eliminación de cuenta, listado (admin)
+- 📄 **Paginación**: Listado eficiente de tópicos, respuestas, cursos y usuarios con soporte para paginación
+- 🔍 **Filtros Avanzados**: Listar respuestas por tópico, usuario o combinación; cursos por categoría
 - ✅ **Validaciones**: Validación de datos de entrada con Bean Validation
 - 🗃️ **Migraciones**: Control de versiones de base de datos con Flyway
-- 📖 **Documentación Automática**: Swagger UI para probar endpoints
+- 📖 **Documentación Automática**: Swagger UI para documentación interactiva de la API
 - 🛡️ **Manejo de Errores**: Sistema centralizado de manejo de excepciones con mensajes claros
 - 🔄 **Borrado Lógico**: Los registros se desactivan en lugar de eliminarse
 - 🔗 **Deshabilitación en Cascada**: Al eliminar usuario/tópico se deshabilitan sus dependencias
 - 🎯 **RESTful**: Diseño de API siguiendo principios REST
-- 🔍 **Validación de Duplicados**: Prevención de tópicos duplicados
+- 🔍 **Validación de Duplicados**: Prevención de tópicos duplicados y cursos duplicados activos
 - 📊 **Estados de Tópicos**: Sistema de estados (ABIERTO, CERRADO)
 - 🧩 **Código Limpio**: Inyección de dependencias por constructor con Lombok
 - 🔐 **Usuarios Deshabilitados**: Manejo específico de cuentas inactivas
+- 🛡️ **Control de Permisos**: Validación de propietario y permisos por rol en operaciones sensibles
 
 ---
 
@@ -393,11 +445,23 @@ Authorization: Bearer {tu_token_jwt}
 | PATCH | `/respuestas/{id}/solucion` | Marcar respuesta como solución | ✅ Sí |
 | DELETE | `/respuestas/{id}` | Eliminar una respuesta (solo autor) | ✅ Sí |
 
+#### 📚 Cursos
+| Método | Endpoint | Descripción | Autenticación | Rol Requerido |
+|--------|----------|-------------|---------------|---------------|
+| POST | `/cursos` | Crear un nuevo curso | ✅ Sí | ADMIN |
+| GET | `/cursos` | Listar todos los cursos (con filtro por categoría) | ✅ Sí | Todos |
+| GET | `/cursos/categorias` | Listar todas las categorías disponibles | ✅ Sí | Todos |
+| PUT | `/cursos/{id}` | Actualizar un curso | ✅ Sí | ADMIN |
+| DELETE | `/cursos/{id}` | Eliminar un curso (borrado lógico) | ✅ Sí | ADMIN |
+
 #### 👤 Usuarios
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| PUT | `/usuarios` | Actualizar email del usuario | ✅ Sí |
-| DELETE | `/usuarios` | Eliminar cuenta (borrado lógico) | ✅ Sí |
+| Método | Endpoint | Descripción | Autenticación | Rol Requerido |
+|--------|----------|-------------|---------------|---------------|
+| GET | `/usuarios/me` | Obtener perfil del usuario autenticado | ✅ Sí | USER/MODERATOR |
+| GET | `/usuarios` | Listar todos los usuarios (paginado) | ✅ Sí | ADMIN |
+| PUT | `/usuarios` | Actualizar email del usuario | ✅ Sí | USER/MODERATOR |
+| DELETE | `/usuarios` | Eliminar cuenta propia (borrado lógico) | ✅ Sí | USER/MODERATOR |
+| DELETE | `/usuarios/{id}` | Desactivar un usuario | ✅ Sí | ADMIN |
 
 ### 📝 Ejemplos de Uso
 
@@ -481,6 +545,32 @@ curl -X PUT http://localhost:8080/usuarios \
   }'
 ```
 
+#### 📚 Crear un Curso (Solo ADMIN)
+
+```bash
+curl -X POST http://localhost:8080/cursos \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Spring Boot Avanzado",
+    "categoria": "BACKEND"
+  }'
+```
+
+#### 📖 Listar Cursos por Categoría
+
+```bash
+curl -X GET "http://localhost:8080/cursos?categoria=BACKEND&page=0&size=10" \
+  -H "Authorization: Bearer {token}"
+```
+
+#### 🏷️ Listar Categorías de Cursos
+
+```bash
+curl -X GET http://localhost:8080/cursos/categorias \
+  -H "Authorization: Bearer {token}"
+```
+
 ---
 
 ## 📁 Estructura del Proyecto
@@ -495,6 +585,7 @@ forohub-api/
 │   │   │   │   ├── 📄 AutenticacionController.java
 │   │   │   │   ├── 📄 TopicoController.java
 │   │   │   │   ├── 📄 RespuestaController.java
+│   │   │   │   ├── 📄 CursoController.java
 │   │   │   │   └── 📄 UsuarioController.java
 │   │   │   ├── 📂 domain/
 │   │   │   │   ├── 📂 topico/
@@ -513,9 +604,18 @@ forohub-api/
 │   │   │   │   │       ├── 📄 DatosRegistroRespuesta.java
 │   │   │   │   │       ├── 📄 DatosActualizacionRespuesta.java
 │   │   │   │   │       └── 📄 DatosDetalleRespuesta.java
+│   │   │   │   ├── 📂 curso/
+│   │   │   │   │   ├── 📄 Curso.java              # Entidad
+│   │   │   │   │   ├── 📄 CursoRepository.java
+│   │   │   │   │   ├── 📄 Categoria.java          # Enum
+│   │   │   │   │   └── 📂 dto/
+│   │   │   │   │       ├── 📄 DatosRegistroCurso.java
+│   │   │   │   │       ├── 📄 DatosActualizacionCurso.java
+│   │   │   │   │       └── 📄 DatosDetalleCurso.java
 │   │   │   │   └── 📂 usuario/
 │   │   │   │       ├── 📄 Usuario.java
 │   │   │   │       ├── 📄 UsuarioRepository.java
+│   │   │   │       ├── 📄 Rol.java                # Enum
 │   │   │   │       └── 📂 dto/
 │   │   │   │           ├── 📄 DatosRegistroUsuario.java
 │   │   │   │           ├── 📄 DatosLoginUsuario.java
@@ -525,8 +625,10 @@ forohub-api/
 │   │   │   │   ├── 📄 AutenticacionService.java
 │   │   │   │   ├── 📄 TopicoService.java
 │   │   │   │   ├── 📄 RespuestaService.java
+│   │   │   │   ├── 📄 CursoService.java
 │   │   │   │   ├── 📄 UsuarioService.java
-│   │   │   │   └── 📄 UsuarioDetailsService.java
+│   │   │   │   ├── 📄 UsuarioDetailsService.java
+│   │   │   │   └── 📄 TopicoValidacionService.java
 │   │   │   └── 📂 infra/
 │   │   │       ├── 📂 exception/
 │   │   │       │   ├── 📄 GlobalExceptionHandler.java
@@ -537,6 +639,7 @@ forohub-api/
 │   │   │       │   ├── 📄 SecurityFilter.java
 │   │   │       │   ├── 📄 TokenService.java
 │   │   │       │   ├── 📄 DatosTokenJWT.java
+│   │   │       │   ├── 📄 RoleConstants.java
 │   │   │       │   ├── 📄 CustomAuthenticationEntryPoint.java
 │   │   │       │   └── 📄 CustomAccessDeniedHandler.java
 │   │   │       └── 📂 springdoc/
@@ -548,7 +651,14 @@ forohub-api/
 │   │           ├── 📄 V2__create-table-usuarios.sql
 │   │           ├── 📄 V3__add-autor-to-topicos.sql
 │   │           ├── 📄 V4__create-table-respuestas.sql
-│   │           └── 📄 V5__add-activo-to-usuarios.sql
+│   │           ├── 📄 V5__add-activo-to-usuarios.sql
+│   │           ├── 📄 V6__create-table-cursos.sql
+│   │           ├── 📄 V7__alter-topicos-add-curso-fk.sql
+│   │           ├── 📄 V8__alter-cursos-remove-unique-nombre.sql
+│   │           ├── 📄 V9__add-rol-to-usuarios.sql
+│   │           ├── 📄 V10__update-rol-values.sql
+│   │           ├── 📄 V11__add-unique-constraint-curso-nombre-activo.sql
+│   │           └── 📄 V12__alter-usuarios-add-unique-email-activo.sql
 │   └── 📂 test/
 │       └── 📂 java/com/fabio/forohub/
 │           └── 📄 ForohubApiApplicationTests.java
